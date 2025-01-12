@@ -1,0 +1,31 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'a'>;
+
+const { href, class: className, ...props } = Astro.props;
+const { pathname } = Astro.url;
+
+// Get the current post category
+const currentCategory = Astro.props.category;
+
+// Check if this is active based on path match and category
+const isActive = 
+  href === pathname || 
+  href === '/' + pathname.split('/')[1] ||
+  (href === '/projects' && currentCategory === 'project') ||
+  (href === '/blog' && currentCategory === 'blog' && !pathname.startsWith('/blog/')) ||
+  (href === '/blog' && currentCategory === 'blog' && pathname.startsWith('/blog/') && currentCategory !== 'project');
+---
+
+<a 
+  href={href} 
+  class:list={[
+    'text-sm font-medium transition-colors duration-200',
+    isActive ? 'text-primary' : 'text-body dark:text-body-dark hover:text-primary dark:hover:text-primary',
+    className
+  ]} 
+  {...props}
+>
+  <slot />
+</a>

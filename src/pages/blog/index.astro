@@ -1,0 +1,58 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+const posts = (await getCollection('blog', ({ data }) => data.category === 'blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body class="bg-background dark:bg-background-dark transition-colors duration-200">
+    <Header />
+    <main class="py-16">
+      <div class="container">
+        <h1 class="mb-12 text-4xl text-center text-heading dark:text-heading-dark">Latest Posts</h1>
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => (
+            <article class="overflow-hidden transition-shadow duration-200 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg">
+              <a href={`/blog/${post.slug}/`}>
+                <img 
+                  src={post.data.heroImage} 
+                  alt={post.data.title}
+                  class="object-cover w-full h-48"
+                />
+                <div class="p-6">
+                  <div class="flex flex-wrap gap-2 mb-4">
+                    {post.data.tags?.map(tag => (
+                      <span class="px-2 py-1 text-xs font-medium text-primary bg-primary/10 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h2 class="mb-2 text-xl font-bold text-heading dark:text-heading-dark hover:text-primary">
+                    {post.data.title}
+                  </h2>
+                  <p class="mb-4 text-secondary dark:text-gray-400">
+                    <FormattedDate date={post.data.pubDate} />
+                  </p>
+                  <p class="text-secondary dark:text-gray-400 line-clamp-3">
+                    {post.data.description}
+                  </p>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>

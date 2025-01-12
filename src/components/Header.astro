@@ -1,0 +1,28 @@
+---
+import HeaderLink from './HeaderLink.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { SITE_TITLE } from '../consts';
+
+interface Props {
+  category?: string;
+}
+
+const { category } = Astro.props;
+---
+
+<header class="py-6 bg-background dark:bg-background-dark shadow-sm transition-colors duration-200">
+  <div class="container">
+    <nav class="flex items-center justify-between">
+      <div>
+        <a href="/" class="text-2xl font-bold text-primary">{SITE_TITLE}</a>
+      </div>
+      <div class="flex items-center space-x-8">
+        <HeaderLink href="/" category={category}>Home</HeaderLink>
+        <HeaderLink href="/projects" category={category}>Projects</HeaderLink>
+        <HeaderLink href="/blog" category={category}>Blog</HeaderLink>
+        <HeaderLink href="/about" category={category}>About</HeaderLink>
+        <ThemeToggle />
+      </div>
+    </nav>
+  </div>
+</header>

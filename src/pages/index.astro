@@ -1,0 +1,141 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../components/FormattedDate.astro';
+
+const latestPosts = (await getCollection('blog', ({ data }) => {
+  return data.category === 'blog';
+}))
+.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+.slice(0, 3);
+
+const featuredProjects = (await getCollection('blog', ({ data }) => {
+  return data.category === 'project' && data.featured === true;
+})).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body class="bg-background dark:bg-background-dark transition-colors duration-200">
+    <Header />
+    <main>
+      {/* Hero Section */}
+      <article class="py-16 bg-gradient-to-b from-background to-gray-50 dark:from-background-dark dark:to-gray-900">
+        <div class="container">
+          <div class="grid items-center grid-cols-1 gap-12 md:grid-cols-2">
+            <div class="order-2 md:order-1">
+              <div class="prose dark:prose-invert">
+                <h1 class="mb-8 text-4xl font-bold text-heading dark:text-heading-dark">Welcome to {SITE_TITLE}</h1>
+                <p class="lead text-body dark:text-body-dark">
+                  Let's begin the amazing journey to <a href="/src/content/blog/first-post.md">plan and build</a> your idea. We will ideate a solution, based on common understanding, realistic expectations, and a clear roadmap. We will work together to create a product that is not only functional but also delightful to use. 
+                </p>
+                <div class="flex gap-4 mt-8">
+                  <a href="/blog" class="btn btn-primary">Design Process</a>
+                  <!-- <a href="/projects" class="btn btn-secondary">View Projects</a> -->
+                </div>
+              </div>
+            </div>
+            <div class="order-1 md:order-2">
+              <img 
+                src="/images/posts/blog-placeholder-about.jpg"
+                alt="Welcome"
+                class="w-full rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
+        </div>
+      </article>
+
+      {/* Latest Blog Posts Section */}
+      <section class="py-16 bg-background dark:bg-background-dark">
+        <div class="container">
+          <h2 class="mb-12 text-3xl font-bold text-center text-heading dark:text-heading-dark">Latest Articles</h2>
+          <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+            {latestPosts.map((post) => (
+              <article class="overflow-hidden transition-shadow duration-200 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg">
+                <a href={`/blog/${post.slug}/`}>
+                  <img 
+                    src={post.data.heroImage} 
+                    alt={post.data.title}
+                    class="object-cover w-full h-48"
+                  />
+                  <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                      {post.data.tags.map(tag => (
+                        <span class="px-2 py-1 text-xs font-medium text-primary bg-primary/10 rounded-full">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 class="mb-2 text-xl font-bold text-heading dark:text-heading-dark hover:text-primary">
+                      {post.data.title}
+                    </h3>
+                    <p class="mb-4 text-secondary dark:text-gray-400">
+                      <FormattedDate date={post.data.pubDate} />
+                    </p>
+                    <p class="text-secondary dark:text-gray-400 line-clamp-3">
+                      {post.data.description}
+                    </p>
+                  </div>
+                </a>
+              </article>
+            ))}
+          </div>
+          <div class="mt-8 text-center">
+            <a href="/blog" class="btn btn-secondary">View All Articles</a>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Projects Section */}
+      {featuredProjects.length > 0 && (
+        <section class="py-16 bg-gray-50 dark:bg-gray-900">
+          <div class="container">
+            <h2 class="mb-12 text-3xl font-bold text-center text-heading dark:text-heading-dark">Featured Projects</h2>
+            <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+              {featuredProjects.map((project) => (
+                <article class="overflow-hidden transition-shadow duration-200 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg">
+                  <a href={`/blog/${project.slug}/`}>
+                    <img 
+                      src={project.data.heroImage} 
+                      alt={project.data.title}
+                      class="object-cover w-full h-48"
+                    />
+                    <div class="p-6">
+                      <div class="flex flex-wrap gap-2 mb-4">
+                        {project.data.tags.map(tag => (
+                          <span class="px-2 py-1 text-xs font-medium text-primary bg-primary/10 rounded-full">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <h3 class="mb-2 text-xl font-bold text-heading dark:text-heading-dark hover:text-primary">
+                        {project.data.title}
+                      </h3>
+                      <p class="mb-4 text-secondary dark:text-gray-400">
+                        <FormattedDate date={project.data.pubDate} />
+                      </p>
+                      <p class="text-secondary dark:text-gray-400 line-clamp-3">
+                        {project.data.description}
+                      </p>
+                    </div>
+                  </a>
+                </article>
+              ))}
+            </div>
+            <div class="mt-8 text-center">
+              <a href="/projects" class="btn btn-secondary">View All Projects</a>
+            </div>
+          </div>
+        </section>
+      )}
+    </main>
+    <Footer />
+  </body>
+</html>
